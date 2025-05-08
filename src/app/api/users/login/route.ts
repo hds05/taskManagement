@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        return NextResponse.json({ message: "Login successful", user }, { status: 200 });
+        // return NextResponse.json({ message: "Login successful", user }, { status: 200 });
 
         //create token data
         const tokenData = {
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         };
 
         // create token 
-        const token = await jwt.sign(tokenData, process.env.JWT_SECRET!, { expiresIn: '1d' });
+        const token = await jwt.sign(tokenData, process.env.JWT_SECRET!, { expiresIn: '1h' });
         console.log("Token created:", token);
 
         const response = NextResponse.json({
