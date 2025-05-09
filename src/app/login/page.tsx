@@ -94,6 +94,10 @@ export default function LoginPage() {
                     Don't have an Account??{' '}
                     <Link className="underline text-blue-600" href='/signup'>SignUp</Link>
                 </p>
+                <p className="text-xs text-gray-800 mt-1">
+                    Forgot Password??{' '}
+                    <Link className="underline text-blue-600" href='/forgotpassword'>Reset</Link>
+                </p>
             </div>
         </div>
     );

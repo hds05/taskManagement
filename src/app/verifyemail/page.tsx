@@ -37,7 +37,8 @@ export default function VerifyEmail() {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
             <h1 className='text-4xl text-black' >Verify Email</h1>
-            <h2 className='text-2xl bg-yellow-400 p-2 mt-1 rounded-lg'>{token ? `${token}` : "No Token"}</h2>
+            <h2 className='text-sm sm:text-base md:text-lg lg:text-xl bg-yellow-400 p-2 mt-1 rounded-lg break-words'>{token ? `${token}` : "No Token"}</h2>
+            
             {verified &&
                 <div>
                     <h1 className="text-2xl font-bold text-green-600">Email verified successfully!</h1>
