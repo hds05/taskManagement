@@ -62,7 +62,7 @@ export default function SignupPage() {
                             required
                             value={user.email}
                             onChange={(e) => setUser({ ...user, email: e.target.value })}
-                            className='w-full p-2 bg-white border border-gray-300 rounded-sm text-base'
+                            className='w-full p-2 bg-white border border-gray-300 rounded-sm text-base focus:ring-2 focus:ring-yellow-400 focus:outline-none'
                         />
                     </label>
 
@@ -77,7 +77,7 @@ export default function SignupPage() {
                             placeholder='Username'
                             value={user.username}
                             onChange={(e) => setUser({ ...user, username: e.target.value })}
-                            style={{ width: '100%', backgroundColor: 'white', border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}
+                            className='w-full p-2 bg-white border border-gray-300 rounded-sm text-base focus:ring-2 focus:ring-yellow-400 focus:outline-none'
                         />
                     </label>
 
@@ -92,7 +92,7 @@ export default function SignupPage() {
                                 required
                                 value={user.password}
                                 onChange={(e) => setUser({ ...user, password: e.target.value })}
-                                className=' w-full p-2 bg-white border border-gray-300 rounded-sm'
+                                className=' w-full p-2 bg-white border border-gray-300 rounded-sm focus:ring-2 focus:ring-yellow-400 focus:outline-none text-base'
                             />
                             <button
                                 type='button'
@@ -107,9 +107,10 @@ export default function SignupPage() {
                     <br />
 
                     <button
-                        className='w-full p-3 mb-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out cursor-pointer'
+                        className={`w-full p-3 mb-3 text-white rounded-lg  transition duration-300  ${buttonDisabled || loading ? ' bg-gray-500 cursor-not-allowed' : ' bg-blue-500 hover:bg-blue-700 cursor-pointer'}`}
                         type="submit"
                         onClick={onSignup}
+                        disabled= {buttonDisabled || loading}
                     >
                         Signup
                     </button>

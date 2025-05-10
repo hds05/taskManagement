@@ -49,7 +49,7 @@ export default function ForgotPassword() {
                     <label className='flex flex-col items-start'>
                         Email:
                         <input
-                            className="w-full border border-gray-300 box-border bg-white text-base px-3 py-2 rounded"
+                            className="w-full border border-gray-300 box-border bg-white text-base px-3 py-2 rounded "
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

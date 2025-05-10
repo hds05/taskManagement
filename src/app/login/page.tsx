@@ -21,7 +21,8 @@ export default function LoginPage() {
             console.log('Login response:', res.data);
             if (res.status === 200) {
                 toast.success('Login successful!');
-                router.push('/profile'); // Redirect to dashboard or home page
+                // router.push('/profile'); // Redirect to dashboard or home page
+                router.push('/tasks'); // Redirect to dashboard or home page
             }
         } catch (error: any) {
             console.log('Login failed:', error.response?.data);
@@ -47,12 +48,12 @@ export default function LoginPage() {
     return (
         <div className='bg-amber-400 p-3 text-center flex items-center justify-center h-screen' >
             <div className="bg-gray-100 p-5 text-black rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center gap-5">
-                <h1 className="text-[30px] text-gray-700 font-black mb-10 border-b-2 ">Login</h1>
+                <h1 className="text-[30px] text-gray-700 font-black mb-1 border-b-2 ">Login</h1>
                 <div className='flex flex-col gap-2.5 w-[300px]' >
                     <label className='flex flex-col items-start'>
                         Email:
                         <input
-                            className="w-full border border-gray-300 box-border bg-white text-base px-3 py-2 rounded"
+                            className="w-full border border-gray-300 box-border focus:ring-2 focus:ring-yellow-400 focus:outline-none  bg-white text-base px-3 py-2 rounded"
                             type="email"
                             value={user.email}
                             onChange={(e) => setUser({ ...user, email: e.target.value })}
@@ -66,7 +67,7 @@ export default function LoginPage() {
                         Password:
                         <div className="relative w-full flex items-center">
                             <input
-                                className="w-full border border-gray-300 bg-white box-border text-base px-3 py-2 rounded"
+                                className="w-full border border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:outline-none bg-white box-border text-base px-3 py-2 rounded"
                                 type={showPassword ? 'text' : 'password'}
                                 name="password"
                                 required
@@ -84,9 +85,11 @@ export default function LoginPage() {
                     </label>
                     <br />
                     <button
-                        className="w-full rounded-lg bg-green-600 p-4 text-white hover:bg-green-800 transition duration-300 ease-in-out cursor-pointer"
+                        className={`w-full py-3 rounded-lg font-bold text-white transition duration-300 ${buttonDisabled || loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 cursor-pointer'}`}
                         onClick={onLogin}
-                        type="submit">
+                        type="submit"
+                        disabled={buttonDisabled || loading}
+                        >
                         Login
                     </button>
                 </div>
