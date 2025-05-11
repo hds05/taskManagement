@@ -9,7 +9,7 @@ export async function GET() {
             success: true
         })
         res.cookies.set(
-            'token', "",
+            'authToken', "",
             {
                 httpOnly: true,
                 expires: new Date(0)

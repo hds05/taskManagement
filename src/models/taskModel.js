@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 const taskSchema = new Schema(
-    {
+    {   taskfor: { type: String, required: true },
         title: { type: String, required: true },
         description: { type: String },
         dueDate: { type: Date },
