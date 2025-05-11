@@ -5,12 +5,26 @@ import { toast } from 'react-hot-toast';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function TasksPage() {
     const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
-
+    const [users, setUsers] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [allTasks, setAllTasks] = useState([]);
+    const [newTask, setNewTask] = useState({
+        taskfor: '',
+        title: '',
+        description: '',
+        dueDate: '',
+        priority: 'Low',
+        status: 'Pending',
+    });
+
+
 
     const checkLoginStatus = async () => {
         try {
@@ -25,17 +39,15 @@ export default function TasksPage() {
         }
     };
 
+    const fetchUsers = async () => {
+        try {
+            const res = await axios.get('/api/users/allusers'); // you need to create this API
+            setUsers(res.data.users);
+        } catch (err) {
+            toast.error('Failed to fetch users');
+        }
+    };
 
-    const [tasks, setTasks] = useState([]);
-    const [allTasks, setAllTasks] = useState([]);
-    const [newTask, setNewTask] = useState({
-        taskfor: '',
-        title: '',
-        description: '',
-        dueDate: '',
-        priority: 'Low',
-        status: 'Pending',
-    });
 
     const fetchTasks = async () => {
         try {
@@ -71,6 +83,30 @@ export default function TasksPage() {
         }
     };
 
+    const handleDelete = async (taskId: string) => {
+        const confirm = window.confirm('Are you sure you want to delete this task?');
+        if (!confirm) return;
+
+        try {
+            const res = await fetch(`/api/users/tasks/${taskId}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                // Optional: refresh tasks or remove from state
+                alert('Task deleted successfully');
+                // You may want to reload the page or update your local state
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to delete task');
+            }
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            alert('Something went wrong');
+        }
+    };
+
 
     const logout = async () => {
         try {
@@ -93,6 +129,7 @@ export default function TasksPage() {
 
     useEffect(() => {
         fetchTasks();
+        fetchUsers();
         checkLoginStatus();
     }, []);
 
@@ -117,14 +154,18 @@ export default function TasksPage() {
                             <div className='absolute right-0  w-[250px] bg-white shadow-lg rounded z-50'>
                                 {isLoggedIn ?
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
-                                        <div className='hover:bg-gray-100 p-2 rounded  border border-gray-400'><Link href={'/profile'}>Profile</Link></div>
-                                        <div className=" hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
+                                        <div className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'><Link href={'/profile'}>Profile</Link></div>
+                                        <div className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
                                     </div>
                                     ) :
-                                    (
-                                        <div className="text-gray-700 hover:bg-gray-100 p-2 rounded cursor-pointer">
-                                            <Link href={'/login'}>Login</Link>
-                                        </div>
+                                    (<div className='text-gray-700 flex flex-col gap-2 p-4'>
+                                        <Link href={'/login'} className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400">
+                                            Login
+                                        </Link>
+                                        <Link href={'/signup'} className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400">
+                                            Signup
+                                        </Link>
+                                    </div>
                                     )
                                 }
                             </div>
@@ -178,7 +219,7 @@ export default function TasksPage() {
                 </div>
 
             </div>
-            
+
             {/* content to show on basis of login */}
             {isLoggedIn ? (
                 <div className="bg-white max-w-[500px] mt-10 p-4 shadow rounded mx-1.5 mb-6 text-center">
@@ -207,7 +248,11 @@ export default function TasksPage() {
                         onChange={(e) => setNewTask({ ...newTask, taskfor: e.target.value })}
                     >
                         <option value="" disabled >Select Task For</option>
-                        <option value="User1">User1</option>
+                        {users.map((user: any) => (
+                            <option key={user._id} value={user.username}>
+                                {user.username}
+                            </option>
+                        ))}
                     </select>
 
                     <select
@@ -248,11 +293,21 @@ export default function TasksPage() {
                             <h3 className="text-md font-extralight text-black ">Task: {task.title}</h3>
                         </div>
                         {/* edit */}
-                        <div>
-                            <Link href={`/tasks/${task._id}`} className="text-sm text-blue-600 hover:underline">
-                                Edit
-                            </Link>
-                        </div>
+                        {isLoggedIn && (
+                            <div className="flex gap-2">
+                                <Link href={`/tasks/${task._id}`} className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                    <EditIcon  />
+                                </Link>
+                                <button
+                                    onClick={() => handleDelete(task._id)}
+                                    className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                >
+                                    <DeleteIcon style={{ color: 'red' }} />
+                                </button>
+                            </div>
+                        )}
+
+
                         <p className='overflow-auto text-sm h-40 border p-1.5 rounded-2xl '>{task.description}</p>
                         <p className="text-sm text-gray-900 mt-2">
                             Due: {task.dueDate?.substring(0, 10)} | Priority: {task.priority} | Status: {task.status}
