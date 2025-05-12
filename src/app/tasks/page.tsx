@@ -175,7 +175,7 @@ export default function TasksPage() {
             </div>
 
             {/* filters */}
-            <div className='flex gap-2 items-center justify-center mt-4'>
+            <div className='flex flex-wrap gap-2 items-center justify-center mt-4'>
                 {/* By search of title and discription */}
                 <div className='flex flex-wrap gap-2 items-center'>
                     <h1 className='text-white font-semibold'>Search:</h1>
@@ -288,29 +288,42 @@ export default function TasksPage() {
             <div className="mb-4 flex flex-wrap justify-center gap-4">
                 {tasks.map((task: any) => (
                     <div key={task._id} className=" w-[300px] h-[300px] flex flex-col justify-between bg-gray-100 p-4 text-gray-600 rounded shadow overflow-auto">
-                        <div>
-                            <h2 className="text-sm font-extralight">Assigned to: {task.taskfor || 'Nobody'}</h2>
-                            <h3 className="text-md font-extralight text-black ">Task: {task.title}</h3>
-                        </div>
-                        {/* edit */}
-                        {isLoggedIn && (
-                            <div className="flex gap-2">
-                                <Link href={`/tasks/${task._id}`} className="text-sm text-blue-600 hover:underline cursor-pointer">
-                                    <EditIcon  />
-                                </Link>
-                                <button
-                                    onClick={() => handleDelete(task._id)}
-                                    className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                >
-                                    <DeleteIcon style={{ color: 'red' }} />
-                                </button>
+                        <div className='flex justify-between items-center'>
+                            <div>
+                                <h2 className="text-sm font-extralight">Assigned to: {task.taskfor || 'Nobody'}</h2>
+                                <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">Task: {task.title}</h3>
                             </div>
-                        )}
+                            {/* edit */}
+                            {isLoggedIn && (
+                                <div className="flex gap-2">
+                                    <Link href={`/tasks/${task._id}`} className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                        <EditIcon />
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(task._id)}
+                                        className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                    >
+                                        <DeleteIcon style={{ color: 'red' }} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
 
-
-                        <p className='overflow-auto text-sm h-40 border p-1.5 rounded-2xl '>{task.description}</p>
-                        <p className="text-sm text-gray-900 mt-2">
-                            Due: {task.dueDate?.substring(0, 10)} | Priority: {task.priority} | Status: {task.status}
+                        <p className='overflow-auto text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl '>{task.description}</p>
+                        <p className="text-sm text-gray-900 mt-2 flex gap-2 flex-wrap">
+                            <span className='bg-gray-300 p-1 rounded-lg'>Due: {task.dueDate?.substring(0, 10)}</span> | <span className='bg-gray-300 p-1 rounded-lg'> Priority: {task.priority}</span> |
+                            <span className='bg-gray-300 p-1 rounded-lg'>
+                                Status: <span className={`
+                                ${task.status === 'Pending'
+                                        ? 'text-red-600'
+                                        : task.status === 'In Progress'
+                                            ? 'text-blue-600'
+                                            : task.status === 'Completed'
+                                                ? 'text-green-600'
+                                                : 'text-gray-900'
+                                    } `}>{task.status}
+                                </span>
+                            </span>
                         </p>
                     </div>
                 ))}
