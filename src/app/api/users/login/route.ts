@@ -19,7 +19,7 @@ export async function GET() {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-        const user = await User.findById(decoded.id).select('_id email');
+        const user = await User.findById(decoded.id).select('_id email username');
 
         if (!user) {
             return NextResponse.json({ user: null }, { status: 200 });

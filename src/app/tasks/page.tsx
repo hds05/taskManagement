@@ -154,7 +154,7 @@ export default function TasksPage() {
                             <div className='absolute right-0  w-[250px] bg-white shadow-lg rounded z-50'>
                                 {isLoggedIn ?
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
-                                        <div className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'><Link href={'/profile'}>Profile</Link></div>
+                                        <Link href={'/profile/user'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Profile</Link>
                                         <div className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
                                     </div>
                                     ) :

@@ -22,7 +22,7 @@ export const config = {
         '/',
         '/login',
         '/signup',
-        // '/profile',
+        '/profiledata',
         '/tasks',
         '/verifyemail',
         '/forgotpassword',
