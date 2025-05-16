@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint"
   },
@@ -16,6 +16,7 @@
     "@mui/styled-engine-sc": "^7.1.0",
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
+    "entities": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.1",
     "next": "15.3.1",

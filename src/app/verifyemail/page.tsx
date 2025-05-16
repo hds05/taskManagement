@@ -18,9 +18,15 @@ export default function VerifyEmail() {
             } else {
                 setError(true);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             setError(true);
-            console.log('Error verifying email:', error.response.data);
+
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: any } };
+                console.log('Error verifying email:', axiosError.response?.data || 'Unknown error');
+            } else {
+                console.log('Error verifying email: Unknown error');
+            }
         }
     }
 

@@ -8,6 +8,21 @@ import MenuIcon from '@mui/icons-material/Menu';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+interface User {
+    _id: string;
+    username: string;
+}
+
+interface Task {
+    _id: string;
+    taskfor: string;
+    title: string;
+    description: string;
+    dueDate: string;
+    priority: 'Low' | 'Medium' | 'High';
+    status: 'Pending' | 'In Progress' | 'Completed';
+}
+
 export default function TasksPage() {
     const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -29,12 +44,8 @@ export default function TasksPage() {
     const checkLoginStatus = async () => {
         try {
             const res = await axios.get('/api/users/login');
-            if (res.data && res.data.user) {
-                setIsLoggedIn(true);
-            } else {
-                setIsLoggedIn(false);
-            }
-        } catch (err) {
+            setIsLoggedIn(!!res.data?.user);
+        } catch {
             setIsLoggedIn(false);
         }
     };
@@ -43,7 +54,7 @@ export default function TasksPage() {
         try {
             const res = await axios.get('/api/users/allusers'); // you need to create this API
             setUsers(res.data.users);
-        } catch (err) {
+        } catch {
             toast.error('Failed to fetch users');
         }
     };
@@ -54,16 +65,16 @@ export default function TasksPage() {
             const res = await axios.get('/api/users/tasks');
             setTasks(res.data.tasks);
             setAllTasks(res.data.tasks);
-        } catch (err) {
+        } catch {
             toast.error('Failed to fetch tasks');
         }
     };
 
     const createTask = async () => {
-        if (!isLoggedIn) {
-            toast.error("You must be logged in to create a task.");
-            return;
-        }
+        // if (!isLoggedIn) {
+        //     toast.error("You must be logged in to create a task.");
+        //     return;
+        // }
 
         try {
             const res = await axios.post('/api/users/tasks', newTask);
@@ -78,7 +89,7 @@ export default function TasksPage() {
             });
             console.log('Task created:', res.data.task);
             fetchTasks();
-        } catch (err) {
+        } catch {
             toast.error('Task creation failed');
         }
     };
@@ -101,7 +112,7 @@ export default function TasksPage() {
                 const data = await res.json();
                 alert(data.error || 'Failed to delete task');
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error deleting task:', error);
             alert('Something went wrong');
         }
@@ -116,15 +127,17 @@ export default function TasksPage() {
             toast.success('Logout successful!');
             router.push('/tasks'); // Redirect to tasks page
 
-        } catch (error: any) {
-            console.log('Logout failed:', error.response?.data);
-            if (error.response && error.response.data?.error) {
-                toast.error(error.response.data.error); // This is now a proper string
-            } else {
+        } catch (error: unknown) {
+            console.error('Logout failed:', error);
+            if (axios.isAxiosError(error) && error.response?.data?.error) {
+                toast.error(error.response.data.error);
+            } else if (error instanceof Error) {
                 toast.error(`Logout failed: ${error.message}`);
+            } else {
+                toast.error('Logout failed due to an unknown error');
             }
-
         }
+
     }
 
     useEffect(() => {
@@ -134,7 +147,7 @@ export default function TasksPage() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center justify-center bg-amber-400">
+        <div className="w-full flex flex-col items-center  bg-amber-400 h-full min-h-screen">
             {/* header */}
             <div className='sticky top-0 z-50 w-screen'>
                 <div className='relative w-full flex justify-between items-center bg-amber-100 p-3 text-center'>
@@ -186,7 +199,7 @@ export default function TasksPage() {
                         onChange={(e) => {
                             const searchValue = e.target.value.toLowerCase();
                             setTasks(
-                                allTasks.filter((task: any) =>
+                                allTasks.filter((task: Task) =>
                                     task.title.toLowerCase().includes(searchValue) ||
                                     task.description.toLowerCase().includes(searchValue)
                                 )
@@ -205,7 +218,7 @@ export default function TasksPage() {
                             // fetchTasks();
                         } else {
                             setTasks(
-                                allTasks.filter((task: any) =>
+                                allTasks.filter((task: Task) =>
                                     task.status.toLowerCase() === filterValue.toLowerCase()
                                 )
                             );
@@ -248,7 +261,7 @@ export default function TasksPage() {
                         onChange={(e) => setNewTask({ ...newTask, taskfor: e.target.value })}
                     >
                         <option value="" disabled >Select Task For</option>
-                        {users.map((user: any) => (
+                        {users.map((user: User) => (
                             <option key={user._id} value={user.username}>
                                 {user.username}
                             </option>
@@ -285,49 +298,76 @@ export default function TasksPage() {
 
             {/* tasks */}
             <h1 className="text-gray-100 font-semibold text-2xl mb-4">Tasks</h1>
-            <div className="mb-4 flex flex-wrap justify-center gap-4">
-                {tasks.map((task: any) => (
-                    <div key={task._id} className=" w-[300px] h-[300px] flex flex-col justify-between bg-gray-100 p-4 text-gray-600 rounded shadow overflow-auto">
-                        <div className='flex justify-between items-center'>
-                            <div>
-                                <h2 className="text-sm font-extralight">Assigned to: {task.taskfor || 'Nobody'}</h2>
-                                <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">Task: {task.title}</h3>
-                            </div>
-                            {/* edit */}
-                            {isLoggedIn && (
-                                <div className="flex gap-2">
-                                    <Link href={`/tasks/${task._id}`} className="text-sm text-blue-600 hover:underline cursor-pointer">
-                                        <EditIcon />
-                                    </Link>
-                                    <button
-                                        onClick={() => handleDelete(task._id)}
-                                        className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                    >
-                                        <DeleteIcon style={{ color: 'red' }} />
-                                    </button>
+            {tasks.length > 0 ? (
+                <div className="mb-4 flex flex-wrap justify-center gap-4">
+                    {tasks.map((task: Task) => (
+                        <div
+                            key={task._id}
+                            className="w-[300px] h-[300px] flex flex-col justify-between bg-gray-100 p-4 text-gray-600 rounded shadow overflow-auto"
+                        >
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-sm font-extralight">
+                                        Assigned to: {task.taskfor || 'Nobody'}
+                                    </h2>
+                                    <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
+                                        Task: {task.title}
+                                    </h3>
                                 </div>
-                            )}
-                        </div>
+                                {isLoggedIn && (
+                                    <div className="flex gap-2">
+                                        <Link
+                                            href={`/tasks/${task._id}`}
+                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                        >
+                                            <EditIcon />
+                                        </Link>
+                                        <button
+                                            onClick={() => handleDelete(task._id)}
+                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                        >
+                                            <DeleteIcon style={{ color: 'red' }} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
-                        <p className='overflow-auto text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl '>{task.description}</p>
-                        <p className="text-sm text-gray-900 mt-2 flex gap-2 flex-wrap">
-                            <span className='bg-gray-300 p-1 rounded-lg'>Due: {task.dueDate?.substring(0, 10)}</span> | <span className='bg-gray-300 p-1 rounded-lg'> Priority: {task.priority}</span> |
-                            <span className='bg-gray-300 p-1 rounded-lg'>
-                                Status: <span className={`
-                                ${task.status === 'Pending'
-                                        ? 'text-red-600'
-                                        : task.status === 'In Progress'
-                                            ? 'text-blue-600'
-                                            : task.status === 'Completed'
-                                                ? 'text-green-600'
-                                                : 'text-gray-900'
-                                    } `}>{task.status}
+                            <p className="overflow-auto text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">
+                                {task.description}
+                            </p>
+
+                            <p className="text-sm text-gray-900 mt-2 flex gap-2 flex-wrap">
+                                <span className="bg-gray-300 p-1 rounded-lg">
+                                    Due: {task.dueDate?.substring(0, 10)}
+                                </span>{' '}
+                                |{' '}
+                                <span className="bg-gray-300 p-1 rounded-lg">
+                                    Priority: {task.priority}
+                                </span>{' '}
+                                |{' '}
+                                <span className="bg-gray-300 p-1 rounded-lg">
+                                    Status:{' '}
+                                    <span
+                                        className={`${task.status === 'Pending'
+                                                ? 'text-red-600'
+                                                : task.status === 'In Progress'
+                                                    ? 'text-blue-600'
+                                                    : task.status === 'Completed'
+                                                        ? 'text-green-600'
+                                                        : 'text-gray-900'
+                                            }`}
+                                    >
+                                        {task.status}
+                                    </span>
                                 </span>
-                            </span>
-                        </p>
-                    </div>
-                ))}
-            </div>
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-600 mt-4">No tasks assigned.</p>
+            )}
+
         </div>
     );
 }

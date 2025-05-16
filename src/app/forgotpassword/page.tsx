@@ -29,12 +29,24 @@ export default function ForgotPassword() {
                 toast.success('Reset link sent to your email!');
                 router.push('/login'); // Redirect to login page
             }
-        } catch (error: any) {
-            console.log('Error sending reset link:', error.response?.data);
-            if (error.response && error.response.data?.error) {
-                toast.error(error.response.data.error); // This is now a proper string
-            } else {
+        } catch (error: unknown) {
+            if (typeof error === "object" && error !== null && "response" in error) {
+                const err = error as { response?: { data?: { error?: string } } };
+                console.log('Error sending reset link:', err.response?.data);
+
+                if (err.response?.data?.error) {
+                    toast.error(err.response.data.error);
+                } else {
+                    toast.error("An unexpected error occurred.");
+                }
+            } else if (error instanceof Error) {
+                // Generic JS error
+                console.log('Error sending reset link:', error.message);
                 toast.error(`Error: ${error.message}`);
+            } else {
+                // Fallback for unknown shapes
+                console.log('Unknown error:', error);
+                toast.error("An unknown error occurred.");
             }
         } finally {
             setLoading(false);
