@@ -2,16 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/taskModel';
 import { connectDB } from '@/dbConfig/dbConfig';
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
 
-export async function GET(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
-    const task = await Task.findById(params.id);
+    const task = await Task.findById(id);
     if (!task) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
@@ -22,11 +21,16 @@ export async function GET(req: NextRequest, { params }: Params) {
   }
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
+
   try {
     await connectDB();
-    const body = await req.json();
-    const updatedTask = await Task.findByIdAndUpdate(params.id, body, { new: true });
+    const body = await request.json();
+    const updatedTask = await Task.findByIdAndUpdate(id, body, { new: true });
     if (!updatedTask) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
@@ -37,10 +41,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: Params) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
+
   try {
     await connectDB();
-    const deletedTask = await Task.findByIdAndDelete(params.id);
+    const deletedTask = await Task.findByIdAndDelete(id);
     if (!deletedTask) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
