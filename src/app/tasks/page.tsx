@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Image from 'next/image';
 
 interface User {
     _id: string;
@@ -152,7 +153,8 @@ export default function TasksPage() {
             <div className='sticky top-0 z-50 w-screen'>
                 <div className='relative w-full flex justify-between items-center bg-amber-100 p-3 text-center'>
                     <div>
-                        <img src="https://cdn-icons-png.flaticon.com/512/15369/15369359.png" width={50} alt="" />
+                        {/* <img src="" width={50} alt="" /> */}
+                        <Image src={'https://cdn-icons-png.flaticon.com/512/15369/15369359.png'} alt={''} width={50} height={50} />
                     </div>
                     <div>
                         <h1 className="text-2xl text-gray-700 font-bold font-sans">Task Manager</h1>

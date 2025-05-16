@@ -9,13 +9,20 @@ interface TokenData {
     [key: string]: any; // Add additional fields as needed
 }
 
-export const extractDataFromToken = (request: NextRequest) => {
+export const extractDataFromToken = (request: NextRequest): string => {
+    const token = request.cookies.get('authToken')?.value;
+    if (!token) {
+        throw new Error('Token not found in cookies');
+    }
+
     try {
-        const token = request.cookies.get('authToken')?.value || '';
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET!);
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as TokenData;
+        if (!decodedToken.id) {
+            throw new Error('Token does not contain a user ID');
+        }
         return decodedToken.id;
-    } catch (error: any) {
-        console.error('Invalid token:', error);
-        throw new Error('Invalid token: ' + error.message);
+    } catch (error: unknown) {
+        console.error('JWT verification error:', error);
+        throw new Error('Invalid token: ' + (error as Error).message);
     }
 };
