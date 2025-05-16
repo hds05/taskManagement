@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/taskModel';
 import { connectDB } from '@/dbConfig/dbConfig';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+type Params = {
+  params: {
+    id: string;
+  };
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
     const task = await Task.findById(params.id);
@@ -16,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
     const body = await req.json();
@@ -31,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
     const deletedTask = await Task.findByIdAndDelete(params.id);
