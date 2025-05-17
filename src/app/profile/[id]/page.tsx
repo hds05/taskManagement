@@ -25,7 +25,7 @@ export default function UserProfile() {
         } catch  (error: unknown){
             // console.error("Failed to fetch user details:", error);
             setUser(null);
-            console.error("Failed to fetch user details");
+            console.error("Failed to fetch user details", error);
         } finally {
             setLoading(false);
         }

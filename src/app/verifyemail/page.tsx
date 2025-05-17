@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import Link from 'next/link';
 
 export default function VerifyEmail() {
@@ -8,36 +8,37 @@ export default function VerifyEmail() {
     const [verified, setVerified] = useState(false);
     const [error, setError] = useState(false);
 
-    const verifyUserEmail = async () => {
-        try {
-            const response = await axios.post('/api/users/verifyemail', { token });
-            if (response.data.success) {
-                setVerified(true);
-            } else {
-                setError(true);
-            }
-        } catch (error: unknown) {
-            setError(true);
-            if (axios.isAxiosError(error)) {
-                console.log('Error verifying email:', error.response?.data || 'Unknown error');
-            } else if (error instanceof Error) {
-                console.log('Error verifying email:', error.message);
-            } else {
-                console.log('Error verifying email: Unknown error');
-            }
-        }
-    };
-
     useEffect(() => {
         const urlToken = window.location.search.split('=')[1];
         setToken(urlToken || '');
     }, []);
 
     useEffect(() => {
-        if (token.length > 0) {
-            verifyUserEmail();
-        }
-    }, [token]); // ✅ Correct dependency
+    if (token.length > 0) {
+        const verifyUserEmail = async () => {
+            try {
+                const response = await axios.post('/api/users/verifyemail', { token });
+                if (response.data.success) {
+                    setVerified(true);
+                } else {
+                    setError(true);
+                }
+            } catch (error: unknown) {
+                setError(true);
+                if (axios.isAxiosError(error)) {
+                    console.log('Error verifying email:', error.response?.data || 'Unknown error');
+                } else if (error instanceof Error) {
+                    console.log('Error verifying email:', error.message);
+                } else {
+                    console.log('Error verifying email: Unknown error');
+                }
+            }
+        };
+
+        verifyUserEmail();
+    }
+}, [token]);
+
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
