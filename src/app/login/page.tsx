@@ -24,14 +24,24 @@ export default function LoginPage() {
                 // router.push('/profile'); // Redirect to dashboard or home page
                 router.push('/tasks'); // Redirect to dashboard or home page
             }
-        } catch (error: any) {
-            console.log('Login failed:', error.response?.data);
-            if (error.response && error.response.data?.error) {
-                toast.error(error.response.data.error); // This is now a proper string
-            } else {
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.log('Login failed:', error.message);
                 toast.error(`Login failed: ${error.message}`);
+            } else if (typeof error === 'object' && error !== null && 'response' in error) {
+                const errObj = error as { response?: { data?: { error?: string } } };
+                console.log('Login failed:', errObj.response?.data);
+
+                if (errObj.response?.data?.error) {
+                    toast.error(errObj.response.data.error);
+                } else {
+                    toast.error('Login failed due to unknown server error.');
+                }
+            } else {
+                toast.error('An unknown error occurred during login.');
             }
-        } finally {
+        }
+        finally {
             setLoading(false);
         }
     }
@@ -89,7 +99,7 @@ export default function LoginPage() {
                         onClick={onLogin}
                         type="submit"
                         disabled={buttonDisabled || loading}
-                        >
+                    >
                         Login
                     </button>
                 </div>

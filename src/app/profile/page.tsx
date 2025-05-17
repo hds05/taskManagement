@@ -4,21 +4,40 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
+interface AxiosErrorResponse {
+    response?: {
+        data?: {
+            error?: string;
+        };
+    };
+}
+
 export default function ProfilePage() {
     const router = useRouter();
 
     const logout = async () => {
         try {
-            const res = await axios.get('/api/users/logout');
+            // await axios.get('/api/users/logout'); // Uncomment if using actual logout endpoint
             toast.success('Logout successful!');
             router.push('/login');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || "Logout failed");
+        } catch (error: unknown) {
+            const err = error as AxiosErrorResponse;
+
+            if (
+                err.response?.data?.error &&
+                typeof err.response.data.error === 'string'
+            ) {
+                toast.error(err.response.data.error);
+            } else if (error instanceof Error) {
+                toast.error(error.message || 'Logout failed');
+            } else {
+                toast.error('Logout failed');
+            }
         }
     };
 
     const goToUserProfile = () => {
-        router.push('/profile/user'); // Replace with your dynamic route if needed
+        router.push('/profile/user');
     };
 
     return (

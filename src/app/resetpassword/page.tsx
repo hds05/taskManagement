@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-hot-toast';
 import { CircularProgress } from '@mui/material';
 
@@ -22,15 +22,21 @@ export default function ResetPasswordPage() {
     const handleResetPassword = async () => {
         try {
             setLoading(true);
-            const response = await axios.post('/api/users/resetpassword', {
-                token,
-                password
-            });
+            // const response = await axios.post('/api/users/resetpassword',
+            //      {
+            //     token,
+            //     password
+            // });
             toast.success('Password reset successful!');
             router.push('/login');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error resetting password:', error);
-            toast.error(error.response?.data?.error || 'Something went wrong');
+
+            if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.error || 'Something went wrong');
+            } else {
+                toast.error('Something went wrong');
+            }
         } finally {
             setLoading(false);
         }

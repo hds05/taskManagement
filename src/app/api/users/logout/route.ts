@@ -16,7 +16,7 @@ export async function GET() {
             }
         );
         return res;
-    } catch (error: any) {
-        return NextResponse.json({ message: "Error logging out", error: error.message || 'Unknown Error' }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json({ message: "Error logging out", error: (error as Error).message || 'Unknown Error' }, { status: 500 });
     }
 }

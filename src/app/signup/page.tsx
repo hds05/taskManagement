@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { toast } from 'react-hot-toast';
@@ -24,13 +24,15 @@ export default function SignupPage() {
                 toast.success('Signup successful!');
                 router.push('/login');
             }
-        } catch (error: any) {
-            console.log('Signup failed:', error.response?.data);
+        } catch (error: unknown) {
+            console.error('Signup failed:', error);
 
-            if (error.response && error.response.data?.error) {
-                toast.error(error.response.data.error); // This is now a proper string
-            } else {
+            if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.error || "Signup failed");
+            } else if (error instanceof Error) {
                 toast.error(`Signup failed: ${error.message}`);
+            } else {
+                toast.error("Signup failed");
             }
         } finally {
             setLoading(false);
@@ -110,7 +112,7 @@ export default function SignupPage() {
                         className={`w-full p-3 mb-3 text-white rounded-lg  transition duration-300  ${buttonDisabled || loading ? ' bg-gray-500 cursor-not-allowed' : ' bg-blue-500 hover:bg-blue-700 cursor-pointer'}`}
                         type="submit"
                         onClick={onSignup}
-                        disabled= {buttonDisabled || loading}
+                        disabled={buttonDisabled || loading}
                     >
                         Signup
                     </button>

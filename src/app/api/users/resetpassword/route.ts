@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
             { message: "Password reset successfully", success: true },
             { status: 200 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Reset Password Error:", error);
         return NextResponse.json(
-            { error: error.message || "Something went wrong" },
+            { error: (error as Error).message || "Something went wrong" },
             { status: 500 }
         );
     }

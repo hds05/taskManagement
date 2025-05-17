@@ -8,7 +8,7 @@ export async function GET() {
 
         const users = await User.find({}, 'username'); // fetch only username
         return NextResponse.json({ users }, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 }

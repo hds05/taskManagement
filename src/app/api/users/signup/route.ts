@@ -4,55 +4,67 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/helpers/mailer";
 
-connectDB()
+// Ensure DB is connected
+connectDB();
 
 export async function POST(request: NextRequest) {
-    // const {username, email, password} = await request.json()
-    // const hashedPassword = await bcrypt.hash(password, 10)
+  try {
+    const { username, email, password } = await request.json();
 
-    try {
-        const reqBody = await request.json()
-        const { username, email, password } = reqBody
+    console.log("User registration attempt:", { username, email });
 
-        console.log("User created successfully", reqBody)
-
-        //check if user is created successfully
-        const user = await User.findOne({ email })
-        if (user) {
-            return NextResponse.json({ error: "User already exists" }, { status: 400 })
-        }
-
-        //hash password
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-
-        const newUser = new User({
-            username,
-            email,
-            password: hashedPassword
-        })
-        const savedUser = await newUser.save()
-        console.log("User created: ", savedUser)
-
-        // send verification email
-        try {
-            await sendEmail({
-                email,
-                emailtype: 'verify',
-                userId: savedUser._id
-            });
-        } catch (emailError: any) {
-            console.error("Email sending failed:", emailError.message);
-            return NextResponse.json({ message: "User created, but email failed", error: emailError.message }, { status: 500 });
-        }
-        
-
-        return NextResponse.json({
-            message: "User created successfully",
-            success: true,
-            savedUser
-        }, { status: 201 })
-    } catch (error: any) {
-        return NextResponse.json({ message: "Error creating user", error: error.message || 'Unknown Error'}, { status: 500 })
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Save new user
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+    });
+    const savedUser = await newUser.save();
+    console.log("User created:", savedUser);
+
+    // Send verification email
+    try {
+      await sendEmail({
+        email,
+        emailtype: "verify",
+        userId: savedUser._id,
+      });
+    } catch (emailError: unknown) {
+      console.error("Email sending failed:", emailError instanceof Error ? emailError.message : emailError);
+
+      return NextResponse.json(
+        {
+          message: "User created, but email failed",
+          error: emailError instanceof Error ? emailError.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: "User created successfully",
+        success: true,
+        user: savedUser,
+      },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error creating user:", errorMessage);
+    return NextResponse.json(
+      { message: "Error creating user", error: errorMessage },
+      { status: 500 }
+    );
+  }
 }

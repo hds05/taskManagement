@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
         await sendEmail({ email, emailtype: "reset", userId: user._id });
 
         return NextResponse.json({ message: "Reset email sent successfully", success: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Forget Password Error:", error);
-        return NextResponse.json({ error: error.message || "Something went wrong" }, { status: 500 });
+        return NextResponse.json({ error: (error as Error).message || "Something went wrong" }, { status: 500 });
     }
 }

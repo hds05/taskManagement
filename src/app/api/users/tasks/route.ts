@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ task }, { status: 201 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating task:', error);
 
-        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+        if ((error as Error).name === 'JsonWebTokenError' || (error as Error).name === 'TokenExpiredError') {
             return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
         }
 

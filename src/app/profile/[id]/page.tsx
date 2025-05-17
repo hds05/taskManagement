@@ -22,8 +22,10 @@ export default function UserProfile() {
                 console.log('User data after sign up:', res.data.user);
 
             }
-        } catch (error: any) {
-            console.error("Failed to fetch user details:", error);
+        } catch  (error: unknown){
+            // console.error("Failed to fetch user details:", error);
+            setUser(null);
+            console.error("Failed to fetch user details");
         } finally {
             setLoading(false);
         }
