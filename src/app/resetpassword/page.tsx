@@ -1,12 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { toast } from 'react-hot-toast';
 import { CircularProgress } from '@mui/material';
 
 export default function ResetPasswordPage() {
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
     const router = useRouter();
     // const token = searchParams.get('token');
 
