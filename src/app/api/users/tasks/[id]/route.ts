@@ -2,15 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/taskModel';
 import { connectDB } from '@/dbConfig/dbConfig';
 
-type ParamsContext = {
-  params: { id: string }
-};
-
 export async function GET(
   request: NextRequest,
-  context: ParamsContext
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { id } = params;
 
   try {
     await connectDB();
@@ -27,9 +23,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: ParamsContext
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { id } = params;
 
   try {
     await connectDB();
@@ -47,9 +43,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: ParamsContext
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { id } = params;
 
   try {
     await connectDB();
