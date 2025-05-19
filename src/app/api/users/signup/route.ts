@@ -5,10 +5,10 @@ import bcrypt from "bcryptjs";
 import { sendEmail } from "@/helpers/mailer";
 
 // Ensure DB is connected
-connectDB();
 
 export async function POST(request: NextRequest) {
-  try {
+    try {
+     await connectDB();
     const { username, email, password } = await request.json();
 
     console.log("User registration attempt:", { username, email });

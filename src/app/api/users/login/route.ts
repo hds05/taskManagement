@@ -56,7 +56,8 @@ export async function POST(req: Request) {
             value: token,
             httpOnly: true,
             path: '/',
-            secure: false,
+            // secure: false,
+            secure: process.env.NODE_ENV === "production",
             sameSite: 'lax',
         });
 
