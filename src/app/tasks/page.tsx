@@ -22,6 +22,7 @@ interface Task {
     dueDate: string;
     priority: 'Low' | 'Medium' | 'High';
     status: 'Pending' | 'In Progress' | 'Completed';
+    assignedBy: string;
 }
 
 export default function TasksPage() {
@@ -38,6 +39,7 @@ export default function TasksPage() {
         dueDate: '',
         priority: 'Low',
         status: 'Pending',
+        assignedBy: '',
     });
 
 
@@ -45,7 +47,14 @@ export default function TasksPage() {
     const checkLoginStatus = async () => {
         try {
             const res = await axios.get('/api/users/login');
-            setIsLoggedIn(!!res.data?.user);
+            if (res.data?.user) {
+                setIsLoggedIn(true);
+                setNewTask((prev) => ({ ...prev, assignedBy: res.data.user.username })); // 👈 set username
+            }
+            // setIsLoggedIn(!!res.data?.user);
+            console.log('Login status:', res.data);
+            console.log('Login status1:', res.data.user.username);
+
         } catch {
             setIsLoggedIn(false);
         }
@@ -72,13 +81,27 @@ export default function TasksPage() {
     };
 
     const createTask = async () => {
-        // if (!isLoggedIn) {
-        //     toast.error("You must be logged in to create a task.");
-        //     return;
-        // }
+        if (!newTask.taskfor || !newTask.title || !newTask.description || !newTask.dueDate) {
+            toast.error("Please fill in all fields.");
+            return;
+        }
+        if (newTask.dueDate < new Date().toISOString().split('T')[0]) {
+            toast.error("Due date cannot be in the past.");
+            return;
+        }
 
         try {
-            const res = await axios.post('/api/users/tasks', newTask);
+            const res = await axios.get('/api/users/login');
+            const currentUsername = res.data?.user?.username;
+            if (!currentUsername) {
+                toast.error("Login expired. Please log in again.");
+                return;
+            }
+
+            const taskToCreate = { ...newTask, assignedBy: currentUsername };
+
+            const taskRes = await axios.post('/api/users/tasks', taskToCreate);
+            // const res = await axios.post('/api/users/tasks', newTask);
             toast.success('Task created!');
             setNewTask({
                 taskfor: '',
@@ -87,8 +110,10 @@ export default function TasksPage() {
                 dueDate: '',
                 priority: 'Low',
                 status: 'Pending',
+                assignedBy: '',
             });
-            console.log('Task created:', res.data.task);
+            // console.log('Task created:', res.data.task);
+              console.log('Task created:', taskRes.data.task);
             fetchTasks();
         } catch {
             toast.error('Task creation failed');
@@ -148,32 +173,42 @@ export default function TasksPage() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center  bg-amber-400 h-full min-h-screen">
+        <div className="w-full flex flex-col items-center  bg-amber-200 h-full min-h-screen bg-cover" style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
             {/* header */}
             <div className='sticky top-0 z-50 w-screen'>
-                <div className='relative w-full flex justify-between items-center bg-amber-100 p-3 text-center'>
+                <div className='relative w-full flex justify-between items-center bg-amber-100 py-3 px-5 text-center'>
                     <div>
                         {/* <img src="" width={50} alt="" /> */}
-                        <Image src={'https://cdn-icons-png.flaticon.com/512/15369/15369359.png'} alt={''} width={50} height={50} />
+                        <Image src={'https://cdn-icons-png.flaticon.com/512/11725/11725603.png'} alt={''} width={50} height={50} />
                     </div>
                     <div>
-                        <h1 className="text-2xl text-gray-700 font-bold font-sans">Task Manager</h1>
+                        <h1 className="text-2xl text-gray-700 font-bold font-sans">TaskFlow</h1>
                     </div>
                     <div className='right-0 top-0 '>
                         <div>
-                            < MenuIcon onClick={() => setMenuOpen(!menuOpen)} className='text-gray-700 cursor-pointer' fontSize='large' />
+                            < MenuIcon id="menu-button" onClick={() => setMenuOpen(!menuOpen)} className='text-gray-700 cursor-pointer' fontSize='large' />
                         </div>
 
                         {/* Side Menu */}
                         {menuOpen && (
-                            <div className='absolute right-0  w-[250px] bg-white shadow-lg rounded z-50'>
+                            <div id="menu-dropdown" className='absolute right-0  w-[250px] bg-white shadow-lg rounded z-50'>
+                                <div className='flex justify-between items-center p-4 border-b'>
+                                    <h1 className='text-gray-700 font-semibold'>Menu</h1>
+                                    <div>
+                                        <Image src={'https://cdn-icons-png.flaticon.com/512/8157/8157896.png'} alt={''} width={30} height={30} />
+                                    </div>
+                                    {/* About */}
+
+                                </div>
                                 {isLoggedIn ?
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
+                                        <Link href={'/about_us'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>About</Link>
                                         <Link href={'/profile/user'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Profile</Link>
                                         <div className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
                                     </div>
                                     ) :
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
+                                        <Link href={'/about_us'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>About</Link>
                                         <Link href={'/login'} className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400">
                                             Login
                                         </Link>
@@ -193,7 +228,7 @@ export default function TasksPage() {
             <div className='flex flex-wrap gap-2 items-center justify-center mt-4'>
                 {/* By search of title and discription */}
                 <div className='flex flex-wrap gap-2 items-center'>
-                    <h1 className='text-white font-semibold'>Search:</h1>
+                    <h1 className='text-black font-semibold'>Search:</h1>
                     <input
                         type="text"
                         placeholder="Search by title or description"
@@ -212,7 +247,7 @@ export default function TasksPage() {
 
                 {/* By status */}
                 <div className='flex gap-2 items-center'>
-                    <h1 className='text-white font-semibold'>Filter by:</h1>
+                    <h1 className='text-black font-semibold'>Filter by:</h1>
                     <select className='border p-2 rounded text-gray-600 bg-amber-50' onChange={(e) => {
                         const filterValue = e.target.value;
                         if (filterValue === 'all') {
@@ -237,7 +272,7 @@ export default function TasksPage() {
 
             {/* content to show on basis of login */}
             {isLoggedIn ? (
-                <div className="bg-white max-w-[500px] mt-10 p-4 shadow rounded mx-1.5 mb-6 text-center">
+                <div className="bg-white max-w-[500px] mt-10 p-4 shadow rounded-3xl mx-1.5 mb-6 text-center">
                     <h2 className="font-semibold mb-2 text-gray-700">Create New Task</h2>
                     <input
                         className="border p-2 w-full mb-2 text-gray-600"
@@ -288,8 +323,9 @@ export default function TasksPage() {
                         <option>In Progress</option>
                         <option>Completed</option>
                     </select>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded shadow-xl hover:shadow-2xl transition-all duration-150 active:translate-y-1 active:shadow-inner"
-                        style={{ boxShadow: ' 9px 5px 4px rgba(0,0,0, 0.4)' }}
+
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded shadow-xl hover:shadow-[1px_7px_4px_rgba(0,0,0,0.2)] transition-all  duration-150 active:translate-y-1 active:shadow-inner"
+                        // style={{ boxShadow: ' 9px 5px 4px rgba(0,0,0, 0.4)' }}
                         onClick={createTask}>
                         Create Task
                     </button>
@@ -299,42 +335,48 @@ export default function TasksPage() {
             )}
 
             {/* tasks */}
-            <h1 className="text-gray-100 font-semibold text-2xl mb-4">Tasks</h1>
+            <h1 className="text-gray-500 font-semibold text-2xl mb-4">Tasks</h1>
             {tasks.length > 0 ? (
                 <div className="mb-4 flex flex-wrap justify-center gap-4">
                     {tasks.map((task: Task) => (
                         <div
                             key={task._id}
-                            className="w-[300px] h-[300px] flex flex-col justify-between bg-gray-100 p-4 text-gray-600 rounded shadow overflow-auto"
+                            className="w-[300px] h-[300px] flex flex-col justify-between p-4 rounded-3xl shadow bg-amber-50 border border-gray-300"
+                            // style={{ backgroundImage: 'url(https://png.pngtree.com/thumb_back/fh260/background/20221226/pngtree-korean-japanese-style-small-fresh-and-pure-wedding-wedding-engagement-invitation-image_1495144.jpg)' }}
                         >
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h2 className="text-sm font-extralight">
-                                        Assigned to: {task.taskfor || 'Nobody'}
-                                    </h2>
+                                    {/* <div className='flex justify-between'> */}
+                                        <h2 className='text-sm font-extralight text-gray-600 '>
+                                            Assigned by: {task.assignedBy || 'Nobody'}
+                                        </h2>
+                                        <h2 className="text-sm font-extralight text-gray-600 ">
+                                            Assigned to: {task.taskfor || 'Nobody'}
+                                        </h2>
+                                    {/* </div> */}
                                     <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
                                         Task: {task.title}
                                     </h3>
                                 </div>
                                 {isLoggedIn && (
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 bg-amber-100 p-1 rounded-2xl border border-gray-200">
                                         <Link
                                             href={`/tasks/${task._id}`}
                                             className="text-sm text-blue-600 hover:underline cursor-pointer"
                                         >
-                                            <EditIcon />
+                                            <EditIcon style={{ color: 'gray' }} />
                                         </Link>
                                         <button
                                             onClick={() => handleDelete(task._id)}
                                             className="text-sm text-blue-600 hover:underline cursor-pointer"
                                         >
-                                            <DeleteIcon style={{ color: 'red' }} />
+                                            <DeleteIcon style={{ color: 'salmon' }} />
                                         </button>
                                     </div>
                                 )}
                             </div>
 
-                            <p className="overflow-auto text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">
+                            <p className="overflow-auto bg-white text-gray-800 text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">
                                 {task.description}
                             </p>
 
@@ -351,12 +393,12 @@ export default function TasksPage() {
                                     Status:{' '}
                                     <span
                                         className={`${task.status === 'Pending'
-                                                ? 'text-red-600'
-                                                : task.status === 'In Progress'
-                                                    ? 'text-blue-600'
-                                                    : task.status === 'Completed'
-                                                        ? 'text-green-600'
-                                                        : 'text-gray-900'
+                                            ? 'text-red-600'
+                                            : task.status === 'In Progress'
+                                                ? 'text-blue-600'
+                                                : task.status === 'Completed'
+                                                    ? 'text-green-600'
+                                                    : 'text-gray-900'
                                             }`}
                                     >
                                         {task.status}

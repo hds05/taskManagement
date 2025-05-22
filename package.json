@@ -17,6 +17,7 @@
     "@netlify/next": "^1.4.9",
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0",
     "entities": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/dotenv": "^6.1.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",

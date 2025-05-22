@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import nodemailer from 'nodemailer';
 import User from '@/models/userModel';
 import crypto from 'crypto';
@@ -7,6 +10,7 @@ interface SendEmailProps {
   emailtype: 'verify' | 'reset';
   userId: string;
 }
+console.log("EMAIL DOMAIN:", process.env.DOMAIN);
 
 export const sendEmail = async ({ email, emailtype, userId }: SendEmailProps) => {
   try {

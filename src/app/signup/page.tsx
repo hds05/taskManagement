@@ -48,7 +48,7 @@ export default function SignupPage() {
     }, [user]);
 
     return (
-        <div className='bg-amber-400 text-start flex items-center justify-center h-screen'>
+        <div className='text-start flex items-center justify-center h-screen' style={{ backgroundImage: 'url("https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg")', backgroundSize: 'cover' }}>
 
             <div className='bg-gray-100 shadow-[0_4px_8px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center gap-2 p-5 rounded-lg text-black' >
 

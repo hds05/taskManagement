@@ -25,7 +25,9 @@ export async function GET() {
             return NextResponse.json({ user: null }, { status: 200 });
         }
 
+        console.log('User found:', user);
         return NextResponse.json({ user }, { status: 200 });
+        
     } catch {
         return NextResponse.json({ user: null }, { status: 200 });
     }
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
             sameSite: 'lax',
         });
 
-        return NextResponse.json({ message: 'Login successful', user: { id: user._id, email: user.email } }, { status: 200 });
+        return NextResponse.json({ message: 'Login successful', user: { id: user._id, email: user.email, username: user.username } }, { status: 200 });
     } catch (error) {
         console.error('Login error:', error);
         return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });

@@ -54,7 +54,7 @@ export default function ForgotPassword() {
     }
 
     return (
-        <div className='bg-amber-400 p-3 text-center flex items-center justify-center h-screen' >
+        <div className='p-3 text-center flex items-center justify-center h-screen' style={{ backgroundImage: 'url("https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg")', backgroundSize: 'cover' }}>
             <div className="bg-gray-100 p-5 text-black rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center gap-5">
                 <h1 className="text-[30px] text-gray-700 font-black mb-10 border-b-2 ">Forget Password</h1>
                 <div className='flex flex-col gap-2.5 w-[300px]' >

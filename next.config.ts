@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     typedRoutes: false, // Disable auto route type generation
   },
   images: {
-    domains: ['cdn-icons-png.flaticon.com'],
+    domains: ['cdn-icons-png.flaticon.com','static.thenounproject.com'],
   },
 };
 

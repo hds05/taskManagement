@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
     };
 
     return (
-        <div className='bg-amber-400 h-screen flex items-center justify-center'>
+        <div className='h-screen flex items-center justify-center' style={{ backgroundImage: 'url("https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg")', backgroundSize: 'cover' }}>
             <div className='bg-white text-gray-900 p-8 rounded shadow-md w-[320px] flex flex-col items-center gap-4'>
                 <h1 className='text-xl font-bold text-gray-700'>Reset Password</h1>
                 <label>Password
