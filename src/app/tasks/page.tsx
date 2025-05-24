@@ -1,7 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast as hotToast } from 'react-hot-toast';
+import { toast as notifyToast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -65,7 +67,7 @@ export default function TasksPage() {
             const res = await axios.get('/api/users/allusers'); // you need to create this API
             setUsers(res.data.users);
         } catch {
-            toast.error('Failed to fetch users');
+            hotToast.error('Failed to fetch users');
         }
     };
 
@@ -76,17 +78,17 @@ export default function TasksPage() {
             setTasks(res.data.tasks);
             setAllTasks(res.data.tasks);
         } catch {
-            toast.error('Failed to fetch tasks');
+            hotToast.error('Failed to fetch tasks');
         }
     };
 
     const createTask = async () => {
         if (!newTask.taskfor || !newTask.title || !newTask.description || !newTask.dueDate) {
-            toast.error("Please fill in all fields.");
+            notifyToast.error("Please fill in all fields.");
             return;
         }
         if (newTask.dueDate < new Date().toISOString().split('T')[0]) {
-            toast.error("Due date cannot be in the past.");
+            notifyToast.error("Due date cannot be in the past.");
             return;
         }
 
@@ -94,7 +96,7 @@ export default function TasksPage() {
             const res = await axios.get('/api/users/login');
             const currentUsername = res.data?.user?.username;
             if (!currentUsername) {
-                toast.error("Login expired. Please log in again.");
+                notifyToast.error("Login expired. Please log in again.");
                 return;
             }
 
@@ -102,7 +104,7 @@ export default function TasksPage() {
 
             const taskRes = await axios.post('/api/users/tasks', taskToCreate);
             // const res = await axios.post('/api/users/tasks', newTask);
-            toast.success('Task created!');
+            notifyToast.success('Task created!');
             setNewTask({
                 taskfor: '',
                 title: '',
@@ -113,10 +115,10 @@ export default function TasksPage() {
                 assignedBy: '',
             });
             // console.log('Task created:', res.data.task);
-              console.log('Task created:', taskRes.data.task);
+            console.log('Task created:', taskRes.data.task);
             fetchTasks();
         } catch {
-            toast.error('Task creation failed');
+            hotToast.error('Task creation failed');
         }
     };
 
@@ -131,7 +133,7 @@ export default function TasksPage() {
 
             if (res.ok) {
                 // Optional: refresh tasks or remove from state
-                alert('Task deleted successfully');
+                hotToast.success('Task deleted successfully');
                 // You may want to reload the page or update your local state
                 window.location.reload();
             } else {
@@ -150,18 +152,17 @@ export default function TasksPage() {
             const res = await axios.get('/api/users/logout');
             console.log('Logout response:', res.data);
             setIsLoggedIn(false);
-            toast.success('Logout successful!');
+            hotToast.success('Logout successful!');
             router.push('/tasks'); // Redirect to tasks page
 
         } catch (error: unknown) {
             console.error('Logout failed:', error);
             if (axios.isAxiosError(error) && error.response?.data?.error) {
-                toast.error(error.response.data.error);
+                console.error('Logout error', error.response.data.error);
             } else if (error instanceof Error) {
-                toast.error(`Logout failed: ${error.message}`);
-            } else {
-                toast.error('Logout failed due to an unknown error');
+                console.error(`Logout failed: ${error.message}`);
             }
+            hotToast.error('Logout failed due to an unknown error');
         }
 
     }
@@ -173,7 +174,7 @@ export default function TasksPage() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center  bg-amber-200 h-full min-h-screen bg-cover" style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
+        <div className="w-full flex flex-col items-center h-full min-h-screen sm:bg-cover bg-repeat-y sm:px-8 py-6" style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
             {/* header */}
             <div className='sticky top-0 z-50 w-screen'>
                 <div className='relative w-full flex justify-between items-center bg-amber-100 py-3 px-5 text-center'>
@@ -272,28 +273,28 @@ export default function TasksPage() {
 
             {/* content to show on basis of login */}
             {isLoggedIn ? (
-                <div className="bg-white max-w-[500px] mt-10 p-4 shadow rounded-3xl mx-1.5 mb-6 text-center">
+                <div className="bg-blue-50 border-2 border-b-gray-500 max-w-[500px] mt-10 p-4 shadow rounded-3xl mx-1.5 mb-6 text-center">
                     <h2 className="font-semibold mb-2 text-gray-700">Create New Task</h2>
                     <input
-                        className="border p-2 w-full mb-2 text-gray-600"
+                        className="border p-2 w-full mb-2 text-gray-600 rounded-2xl bg-white"
                         placeholder="Title"
                         value={newTask.title}
                         onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                     />
                     <textarea
-                        className="border p-2 w-full mb-2 text-gray-600"
+                        className="border p-2 w-full mb-2 text-gray-600 rounded-2xl bg-white"
                         placeholder="Description"
                         value={newTask.description}
                         onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                     />
                     <input
-                        className="border p-2 w-full mb-2 text-gray-600"
+                        className="border p-2 w-full mb-2 text-gray-600 rounded-2xl bg-white"
                         type="date"
                         value={newTask.dueDate}
                         onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
                     />
                     <select
-                        className="border p-2 w-full mb-2 text-gray-600"
+                        className="border p-2 w-full mb-2 text-gray-600 rounded-2xl bg-white"
                         value={newTask.taskfor}
                         onChange={(e) => setNewTask({ ...newTask, taskfor: e.target.value })}
                     >
@@ -306,7 +307,7 @@ export default function TasksPage() {
                     </select>
 
                     <select
-                        className="border p-2 w-full mb-2 text-gray-600"
+                        className="border p-2 w-full mb-2 text-gray-600 rounded-2xl bg-white"
                         value={newTask.priority}
                         onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
                     >
@@ -315,7 +316,7 @@ export default function TasksPage() {
                         <option>High</option>
                     </select>
                     <select
-                        className="border p-2 w-full mb-4 text-gray-600"
+                        className="border p-2 w-full mb-4 text-gray-600 rounded-2xl bg-white"
                         value={newTask.status}
                         onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
                     >
@@ -337,22 +338,22 @@ export default function TasksPage() {
             {/* tasks */}
             <h1 className="text-gray-500 font-semibold text-2xl mb-4">Tasks</h1>
             {tasks.length > 0 ? (
-                <div className="mb-4 flex flex-wrap justify-center gap-4">
+                <div className="mb-4 flex flex-wrap justify-center gap-4 p-3 rounded-2xl" style={{background:'#D0F0C0'}}>
                     {tasks.map((task: Task) => (
                         <div
                             key={task._id}
                             className="w-[300px] h-[300px] flex flex-col justify-between p-4 rounded-3xl shadow bg-amber-50 border border-gray-300"
-                            // style={{ backgroundImage: 'url(https://png.pngtree.com/thumb_back/fh260/background/20221226/pngtree-korean-japanese-style-small-fresh-and-pure-wedding-wedding-engagement-invitation-image_1495144.jpg)' }}
+                        // style={{ backgroundImage: 'url(https://png.pngtree.com/thumb_back/fh260/background/20221226/pngtree-korean-japanese-style-small-fresh-and-pure-wedding-wedding-engagement-invitation-image_1495144.jpg)' }}
                         >
                             <div className="flex justify-between items-center">
                                 <div>
                                     {/* <div className='flex justify-between'> */}
-                                        <h2 className='text-sm font-extralight text-gray-600 '>
-                                            Assigned by: {task.assignedBy || 'Nobody'}
-                                        </h2>
-                                        <h2 className="text-sm font-extralight text-gray-600 ">
-                                            Assigned to: {task.taskfor || 'Nobody'}
-                                        </h2>
+                                    <h2 className='text-sm font-extralight text-gray-600 '>
+                                        Assigned by: {task.assignedBy || 'Nobody'}
+                                    </h2>
+                                    <h2 className="text-sm font-extralight text-gray-600 ">
+                                        Assigned to: {task.taskfor || 'Nobody'}
+                                    </h2>
                                     {/* </div> */}
                                     <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
                                         Task: {task.title}

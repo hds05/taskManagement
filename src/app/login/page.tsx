@@ -5,6 +5,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { toast as notifyToast } from "react-toastify";
 import axios from "axios";
 
 export default function LoginPage() {
@@ -25,18 +26,21 @@ export default function LoginPage() {
                 router.push('/tasks'); // Redirect to dashboard or home page
             }
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log('Login failed:', error.message);
-                toast.error(`Login failed: ${error.message}`);
-            } else if (typeof error === 'object' && error !== null && 'response' in error) {
-                const errObj = error as { response?: { data?: { error?: string } } };
-                console.log('Login failed:', errObj.response?.data);
+            if (axios.isAxiosError(error)) {
+                // Axios error, check response status and message
+                const status = error.response?.status;
+                const errorMsg = error.response?.data?.error;
 
-                if (errObj.response?.data?.error) {
-                    toast.error(errObj.response.data.error);
+                if (status === 403 && errorMsg === 'Your email is not verified. Please verify your email before logging in.') {
+                    notifyToast.error('Please verify your email before logging in.');
+                } else if (errorMsg) {
+                    toast.error(errorMsg);
                 } else {
                     toast.error('Login failed due to unknown server error.');
                 }
+            } else if (error instanceof Error) {
+                // Generic JS error
+                toast.error(`Login failed: ${error.message}`);
             } else {
                 toast.error('An unknown error occurred during login.');
             }
@@ -56,7 +60,7 @@ export default function LoginPage() {
     }, [user]);
 
     return (
-        <div className='p-3 text-center flex items-center justify-center h-screen bg-cover' style={{ backgroundImage: 'url("https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg")' }}> 
+        <div className='p-3 text-center flex items-center justify-center h-screen bg-cover' style={{ backgroundImage: 'url("https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg")' }}>
             <div className="bg-gray-100 p-5 text-black rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center gap-5">
                 <h1 className="text-[30px] text-gray-700 font-black mb-1 border-b-2 ">Login</h1>
                 <div className='flex flex-col gap-2.5 w-[300px]' >
@@ -104,7 +108,7 @@ export default function LoginPage() {
                     </button>
                 </div>
                 <p className="text-sm text-gray-800 mt-3">
-                     Don&apos;t have an Account??{' '}
+                    Don&apos;t have an Account??{' '}
                     <Link className="underline text-blue-600" href='/signup'>SignUp</Link>
                 </p>
                 <p className="text-xs text-gray-800 mt-1">

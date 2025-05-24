@@ -10,7 +10,6 @@ interface SendEmailProps {
   emailtype: 'verify' | 'reset';
   userId: string;
 }
-console.log("EMAIL DOMAIN:", process.env.DOMAIN);
 
 export const sendEmail = async ({ email, emailtype, userId }: SendEmailProps) => {
   try {
@@ -50,9 +49,35 @@ export const sendEmail = async ({ email, emailtype, userId }: SendEmailProps) =>
       from: 'duttsharmahimanshu96@gmail.com',
       to: email,
       subject: emailtype === 'verify' ? 'Verify your email' : 'Reset your password',
-      html: `<p>Click <a href="${process.env.DOMAIN}/${emailtype === 'verify' ? 'verifyemail' : 'resetpassword'}?token=${rawToken}">here</a> to ${
-        emailtype === 'verify' ? 'verify your email' : 'reset your password'
-      } or copy and paste the link below in your browser.<br>${process.env.DOMAIN}/${emailtype === 'verify' ? 'verifyemail' : 'resetpassword'}?token=${rawToken}</p>`,
+      html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; color: #333;">
+              <h2 style="color: #007BFF;">${emailtype === 'verify' ? 'Verify Your Email Address' : 'Reset Your Password'}</h2>
+              <p>Hello,</p>
+              <p>To ${emailtype === 'verify' ? 'verify your email address' : 'reset your password'}, please click the button below:</p>
+              <p style="text-align: center; margin: 30px 0;">
+                <a 
+                  href="${process.env.DOMAIN}/${emailtype === 'verify' ? 'verifyemail' : 'resetpassword'}?token=${rawToken}" 
+                  style="background-color: #007BFF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ${emailtype === 'verify' ? 'Verify Email' : 'Reset Password'}
+                </a>
+              </p>
+              <p>If the button above does not work, please copy and paste the following link into your web browser:</p>
+              <p style="word-break: break-all; background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
+                <a href="${process.env.DOMAIN}/${emailtype === 'verify' ? 'verifyemail' : 'resetpassword'}?token=${rawToken}" target="_blank" rel="noopener noreferrer" style="color: #007BFF;">
+                  ${process.env.DOMAIN}/${emailtype === 'verify' ? 'verifyemail' : 'resetpassword'}?token=${rawToken}
+                </a>
+              </p>
+              <p style="margin-top: 40px; font-size: 12px; color: #999;">
+                If you did not request this email, please ignore it.
+              </p>
+              <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+              <p style="font-size: 12px; color: #999;">
+                &copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.
+              </p>
+            </div>
+            `,
     };
 
     // Send email
