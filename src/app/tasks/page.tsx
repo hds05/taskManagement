@@ -34,6 +34,7 @@ export default function TasksPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [allTasks, setAllTasks] = useState([]);
+    const [currentUsername, setCurrentUsername] = useState('');
     const [newTask, setNewTask] = useState({
         taskfor: '',
         title: '',
@@ -51,7 +52,9 @@ export default function TasksPage() {
             const res = await axios.get('/api/users/login');
             if (res.data?.user) {
                 setIsLoggedIn(true);
-                setNewTask((prev) => ({ ...prev, assignedBy: res.data.user.username })); // 👈 set username
+                const username = res.data.user.username;
+                setCurrentUsername(username); // <-- Save it
+                setNewTask((prev) => ({ ...prev, assignedBy: username }));
             }
             // setIsLoggedIn(!!res.data?.user);
             console.log('Login status:', res.data);
@@ -75,8 +78,15 @@ export default function TasksPage() {
     const fetchTasks = async () => {
         try {
             const res = await axios.get('/api/users/tasks');
-            setTasks(res.data.tasks);
-            setAllTasks(res.data.tasks);
+            const allFetchedTasks = res.data.tasks;
+
+            // Filter here based on currentUsername
+            if (currentUsername) {
+                const filtered = allFetchedTasks.filter((task: Task) => task.taskfor === currentUsername);
+                setTasks(filtered);
+            }
+
+            setAllTasks(allFetchedTasks); // Keep unfiltered list for searching/filtering
         } catch {
             hotToast.error('Failed to fetch tasks');
         }
@@ -167,11 +177,23 @@ export default function TasksPage() {
 
     }
 
+    // useEffect(() => {
+    //     fetchTasks();
+    //     fetchUsers();
+    //     checkLoginStatus();
+    // }, []);
+
     useEffect(() => {
-        fetchTasks();
-        fetchUsers();
-        checkLoginStatus();
+        checkLoginStatus(); // First, get the username
     }, []);
+
+    useEffect(() => {
+        if (currentUsername) {
+            fetchTasks(); // Then fetch and filter tasks based on it
+            fetchUsers();
+        }
+    }, [currentUsername]);
+
 
     return (
         <div className="w-full flex flex-col items-center h-full min-h-screen sm:bg-cover bg-repeat-y sm:px-8 py-6" style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
@@ -337,80 +359,90 @@ export default function TasksPage() {
 
             {/* tasks */}
             <h1 className="text-gray-500 font-semibold text-2xl mb-4">Tasks</h1>
-            {tasks.length > 0 ? (
-                <div className="mb-4 flex flex-wrap justify-center gap-4 p-3 rounded-2xl" style={{background:'#D0F0C0'}}>
-                    {tasks.map((task: Task) => (
-                        <div
-                            key={task._id}
-                            className="w-[300px] h-[300px] flex flex-col justify-between p-4 rounded-3xl shadow bg-amber-50 border border-gray-300"
-                        // style={{ backgroundImage: 'url(https://png.pngtree.com/thumb_back/fh260/background/20221226/pngtree-korean-japanese-style-small-fresh-and-pure-wedding-wedding-engagement-invitation-image_1495144.jpg)' }}
-                        >
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    {/* <div className='flex justify-between'> */}
-                                    <h2 className='text-sm font-extralight text-gray-600 '>
-                                        Assigned by: {task.assignedBy || 'Nobody'}
-                                    </h2>
-                                    <h2 className="text-sm font-extralight text-gray-600 ">
-                                        Assigned to: {task.taskfor || 'Nobody'}
-                                    </h2>
-                                    {/* </div> */}
-                                    <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
-                                        Task: {task.title}
-                                    </h3>
-                                </div>
-                                {isLoggedIn && (
-                                    <div className="flex gap-2 bg-amber-100 p-1 rounded-2xl border border-gray-200">
-                                        <Link
-                                            href={`/tasks/${task._id}`}
-                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                        >
-                                            <EditIcon style={{ color: 'gray' }} />
-                                        </Link>
-                                        <button
-                                            onClick={() => handleDelete(task._id)}
-                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                        >
-                                            <DeleteIcon style={{ color: 'salmon' }} />
-                                        </button>
+            {isLoggedIn ? (
+
+                tasks.length > 0 ? (
+                    <div className="mb-4 flex flex-wrap justify-center gap-4 p-3 rounded-2xl" style={{ background: '#D0F0C0' }}>
+                        {tasks.map((task: Task) => (
+                            <div
+                                key={task._id}
+                                className="w-[300px] h-[300px] flex flex-col justify-between p-4 rounded-3xl shadow bg-amber-50 border border-gray-300"
+                            // style={{ backgroundImage: 'url(https://png.pngtree.com/thumb_back/fh260/background/20221226/pngtree-korean-japanese-style-small-fresh-and-pure-wedding-wedding-engagement-invitation-image_1495144.jpg)' }}
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        {/* <div className='flex justify-between'> */}
+                                        <h2 className='text-sm font-extralight text-gray-600 '>
+                                            Assigned by: {task.assignedBy || 'Nobody'}
+                                        </h2>
+                                        <h2 className="text-sm font-extralight text-gray-600 ">
+                                            Assigned to: {task.taskfor || 'Nobody'}
+                                        </h2>
+                                        {/* </div> */}
+                                        <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
+                                            Task: {task.title}
+                                        </h3>
                                     </div>
-                                )}
-                            </div>
+                                    {isLoggedIn && (
+                                        <div className="flex gap-2 bg-amber-100 p-1 rounded-2xl border border-gray-200">
+                                            <Link
+                                                href={`/tasks/${task._id}`}
+                                                className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                            >
+                                                <EditIcon style={{ color: 'gray' }} />
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(task._id)}
+                                                className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                            >
+                                                <DeleteIcon style={{ color: 'salmon' }} />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
 
-                            <p className="overflow-auto bg-white text-gray-800 text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">
-                                {task.description}
-                            </p>
+                                <p className="overflow-auto bg-white text-gray-800 text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">
+                                    {task.description}
+                                </p>
 
-                            <p className="text-sm text-gray-900 mt-2 flex gap-2 flex-wrap">
-                                <span className="bg-gray-300 p-1 rounded-lg">
-                                    Due: {task.dueDate?.substring(0, 10)}
-                                </span>{' '}
-                                |{' '}
-                                <span className="bg-gray-300 p-1 rounded-lg">
-                                    Priority: {task.priority}
-                                </span>{' '}
-                                |{' '}
-                                <span className="bg-gray-300 p-1 rounded-lg">
-                                    Status:{' '}
-                                    <span
-                                        className={`${task.status === 'Pending'
-                                            ? 'text-red-600'
-                                            : task.status === 'In Progress'
-                                                ? 'text-blue-600'
-                                                : task.status === 'Completed'
-                                                    ? 'text-green-600'
-                                                    : 'text-gray-900'
-                                            }`}
-                                    >
-                                        {task.status}
+                                <p className="text-sm text-gray-900 mt-2 flex gap-2 flex-wrap">
+                                    <span className="bg-gray-300 p-1 rounded-lg">
+                                        Due: {task.dueDate?.substring(0, 10)}
+                                    </span>{' '}
+                                    |{' '}
+                                    <span className="bg-gray-300 p-1 rounded-lg">
+                                        Priority: {task.priority}
+                                    </span>{' '}
+                                    |{' '}
+                                    <span className="bg-gray-300 p-1 rounded-lg">
+                                        Status:{' '}
+                                        <span
+                                            className={`${task.status === 'Pending'
+                                                ? 'text-red-600'
+                                                : task.status === 'In Progress'
+                                                    ? 'text-blue-600'
+                                                    : task.status === 'Completed'
+                                                        ? 'text-green-600'
+                                                        : 'text-gray-900'
+                                                }`}
+                                        >
+                                            {task.status}
+                                        </span>
                                     </span>
-                                </span>
-                            </p>
-                        </div>
-                    ))}
-                </div>
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-600 mt-4">No tasks assigned.</p>
+                )
             ) : (
-                <p className="text-center text-gray-600 mt-4">No tasks assigned.</p>
+                <div className="mt-10 text-center">
+                    <h2 className="text-gray-600 font-semibold">Please log in to see your tasks.</h2>
+                    <Link href="/login" className="text-blue-600 hover:underline mt-2 inline-block">
+                        Login
+                    </Link>
+                </div>
             )}
 
         </div>

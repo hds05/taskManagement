@@ -46,7 +46,7 @@ export const sendEmail = async ({ email, emailtype, userId }: SendEmailProps) =>
 
     // Email content
     const mailOptions = {
-      from: 'duttsharmahimanshu96@gmail.com',
+      from: process.env.FROM_EMAIL,
       to: email,
       subject: emailtype === 'verify' ? 'Verify your email' : 'Reset your password',
       html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; color: #333;">

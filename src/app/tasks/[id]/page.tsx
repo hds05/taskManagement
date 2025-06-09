@@ -72,7 +72,7 @@ export default function EditTaskPage() {
     if (loading) return <div className="p-4 text-gray-600">Loading task...</div>;
 
     return (
-        <div className='bg-amber-400 p-3 text-center flex items-center justify-center h-screen'>
+        <div className='bg-cover p-3 text-center flex items-center justify-center h-screen' style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
             <div className="max-w-md mx-auto mt-10 p-4 bg-white shadow rounded">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-gray-700 mb-4">Edit Task</h2>
@@ -86,8 +86,9 @@ export default function EditTaskPage() {
                 <input
                     name="taskfor"
                     placeholder="Task For"
-                    value={task.taskfor}
-                    onChange={handleChange}
+                    defaultValue={task.taskfor}
+                    readOnly
+                    // onChange={handleChange}
                     className="border p-2 w-full mb-2 text-gray-600"
                 />
                 <input
