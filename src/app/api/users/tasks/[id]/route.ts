@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/taskModel';
 import { connectDB } from '@/dbConfig/dbConfig';
 
-export async function GET(request: NextRequest, context: any) {
-  const { id } = context.params;
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
 
   try {
     await connectDB();

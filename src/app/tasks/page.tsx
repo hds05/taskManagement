@@ -379,26 +379,27 @@ export default function TasksPage() {
                                             Assigned to: {task.taskfor || 'Nobody'}
                                         </h2>
                                         {/* </div> */}
-                                        <h3 className="text-md font-extralight text-black max-h-10 overflow-auto">
-                                            Task: {task.title}
+                                        <h3 className="text-lg font-semibold text-gray-800 mt-2">
+                                            Task:
                                         </h3>
+                                        <span className='text-md font-extralight text-black max-h-10 overflow-auto'>{task.title}</span>
                                     </div>
-                                    {isLoggedIn && (
-                                        <div className="flex gap-2 bg-amber-100 p-1 rounded-2xl border border-gray-200">
-                                            <Link
-                                                href={`/tasks/${task._id}`}
-                                                className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                            >
-                                                <EditIcon style={{ color: 'gray' }} />
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(task._id)}
-                                                className="text-sm text-blue-600 hover:underline cursor-pointer"
-                                            >
-                                                <DeleteIcon style={{ color: 'salmon' }} />
-                                            </button>
-                                        </div>
-                                    )}
+                                    {/* {isLoggedIn && ( */}
+                                    <div className="flex gap-2 bg-amber-100 p-1 rounded-2xl border border-gray-200">
+                                        <Link
+                                            href={`/tasks/${task._id}?user=${currentUsername}&taskBy=${task.assignedBy}`}
+                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                        >
+                                            <EditIcon style={{ color: 'gray' }} />
+                                        </Link>
+                                        <button
+                                            onClick={() => handleDelete(task._id)}
+                                            className="text-sm text-blue-600 hover:underline cursor-pointer"
+                                        >
+                                            <DeleteIcon style={{ color: 'salmon' }} />
+                                        </button>
+                                    </div>
+                                    {/* )} */}
                                 </div>
 
                                 <p className="overflow-auto bg-white text-gray-800 text-sm h-40 border border-gray-500 mt-1.5 p-1.5 rounded-2xl">

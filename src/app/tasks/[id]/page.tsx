@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+
 
 export default function EditTaskPage() {
     const { id } = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const user = searchParams.get('user'); // 👈 This gets the user from ?user=...
+    const taskBy = searchParams.get('taskBy'); // 👈 This gets the user from ?user=...
+    // You can now use `user` anywhere in this component
+    console.log('User passed in URL:', user);
+    console.log('Task assigned by:', taskBy);
 
     const [task, setTask] = useState({
         taskfor: '',
+        assignedBy: '',
         title: '',
         description: '',
         dueDate: '',
@@ -70,9 +79,12 @@ export default function EditTaskPage() {
     };
 
     if (loading) return <div className="p-4 text-gray-600">Loading task...</div>;
+    
+    const istaskFor = user === task.taskfor;
+    const istaskby = user === task.assignedBy;
 
     return (
-        <div className='bg-cover p-3 text-center flex items-center justify-center h-screen' style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
+        <div className='bg-cover p-3 text-center flex items-center justify-center min-h-screen' style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')" }}>
             <div className="max-w-md mx-auto mt-10 p-4 bg-white shadow rounded">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-gray-700 mb-4">Edit Task</h2>
@@ -84,9 +96,17 @@ export default function EditTaskPage() {
                     </button>
                 </div>
                 <input
+                    name="assignedBy"
+                    placeholder="Assigned By"
+                    value={task.assignedBy}
+                    readOnly
+                    // onChange={handleChange}
+                    className="border p-2 w-full mb-2 text-gray-600"
+                />
+                <input
                     name="taskfor"
                     placeholder="Task For"
-                    defaultValue={task.taskfor}
+                    value={task.taskfor}
                     readOnly
                     // onChange={handleChange}
                     className="border p-2 w-full mb-2 text-gray-600"
@@ -95,6 +115,7 @@ export default function EditTaskPage() {
                     name="title"
                     placeholder="Title"
                     value={task.title}
+                    readOnly={!istaskby}
                     onChange={handleChange}
                     className="border p-2 w-full mb-2 text-gray-600"
                 />
@@ -102,20 +123,24 @@ export default function EditTaskPage() {
                     name="description"
                     placeholder="Description"
                     value={task.description}
+                    readOnly={!istaskby}
                     onChange={handleChange}
                     className="border p-2 w-full mb-2 text-gray-600"
                 />
                 <input
                     type="date"
                     name="dueDate"
-                    value={task.dueDate?.substring(0, 10)}
+                    // value={task.dueDate?.substring(0, 10)}
+                    value={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''}
                     onChange={handleChange}
+                    readOnly={!istaskby}
                     className="border p-2 w-full mb-2 text-gray-600"
                 />
                 <select
                     name="priority"
                     value={task.priority}
                     onChange={handleChange}
+                    disabled={!istaskby}
                     className="border p-2 w-full mb-2 text-gray-600"
                 >
                     <option>Low</option>
@@ -126,6 +151,7 @@ export default function EditTaskPage() {
                     name="status"
                     value={task.status}
                     onChange={handleChange}
+                    disabled={!istaskFor}
                     className="border p-2 w-full mb-4 text-gray-600"
                 >
                     <option>Pending</option>
