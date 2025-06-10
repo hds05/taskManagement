@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/taskModel';
 import { connectDB } from '@/dbConfig/dbConfig';
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-  const id = context.params.id;
+export async function GET(request: NextRequest,   { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
   try {
     await connectDB();
@@ -18,8 +19,9 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   }
 }
 
-export async function PUT(request: NextRequest, context: any) {
-  const { id } = context.params;
+export async function PUT(request: NextRequest,  { params }: { params: Promise<{ id: string }> }
+) {
+const { id } = await params;
 
   try {
     await connectDB();
@@ -35,8 +37,9 @@ export async function PUT(request: NextRequest, context: any) {
   }
 }
 
-export async function DELETE(request: NextRequest, context: any) {
-  const { id } = context.params;
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }
+) {
+const { id } = await params;
 
   try {
     await connectDB();
