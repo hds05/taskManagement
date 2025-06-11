@@ -44,7 +44,8 @@ export default function UserProfile() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500 p-6">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br p-6"
+        style={{ backgroundImage: "url('https://png.pngtree.com/background/20250209/original/pngtree-flowers-frame-green-paper-free-printable-picture-image_13243021.jpg')", backgroundSize: 'cover' }}>
             <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md text-center">
                 <h1 className="text-3xl font-extrabold text-gray-800 mb-6">User Profile</h1>
 

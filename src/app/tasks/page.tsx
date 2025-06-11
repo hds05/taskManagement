@@ -91,6 +91,14 @@ export default function TasksPage() {
             hotToast.error('Failed to fetch tasks');
         }
     };
+    
+    // const assignedBy = async () => {
+    //     const res = await axios.get('/api/users/tasks');
+    //     const allTasks = res.data.tasks;
+    //     const filteredTasks = allTasks.filter((task: Task) => task.assignedBy === currentUsername);
+    //     setTasks(filteredTasks);
+    //     setAllTasks(allTasks); // Keep unfiltered list for searching/filtering
+    // }
 
     const createTask = async () => {
         if (!newTask.taskfor || !newTask.title || !newTask.description || !newTask.dueDate) {
@@ -227,6 +235,7 @@ export default function TasksPage() {
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
                                         <Link href={'/about_us'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>About</Link>
                                         <Link href={'/profile/user'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Profile</Link>
+                                        <Link href={`/assignedtasks?user=${currentUsername}`} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Assigned Tasks</Link>
                                         <div className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
                                     </div>
                                     ) :
@@ -358,7 +367,7 @@ export default function TasksPage() {
             )}
 
             {/* tasks */}
-            <h1 className="text-gray-500 font-semibold text-2xl mb-4">Tasks</h1>
+            <h1 className="text-gray-500 font-semibold text-2xl mb-4">Tasks for you :</h1>
             {isLoggedIn ? (
 
                 tasks.length > 0 ? (
@@ -435,7 +444,7 @@ export default function TasksPage() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-center text-gray-600 mt-4">No tasks assigned.</p>
+                    <p className="text-center text-gray-600 mt-4">No tasks assigned. 😒😒😴</p>
                 )
             ) : (
                 <div className="mt-10 text-center">
