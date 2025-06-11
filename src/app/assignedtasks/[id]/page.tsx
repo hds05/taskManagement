@@ -1,7 +1,6 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams,useParams ,useRouter } from 'next/navigation';
 import axios from 'axios';
 import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
@@ -20,8 +19,10 @@ interface Task {
 
 export default function AssignedTasksPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const assignedByUser = searchParams.get('user');
+    const { id } = useParams();
+    // const searchParams = useSearchParams();
+    // const assignedByUser = searchParams.get('user');
+    const assignedByUser = id as string; // Assuming `id` is the assignedByUser
 
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);

@@ -235,7 +235,7 @@ export default function TasksPage() {
                                     (<div className='text-gray-700 flex flex-col gap-2 p-4'>
                                         <Link href={'/about_us'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>About</Link>
                                         <Link href={'/profile/user'} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Profile</Link>
-                                        <Link href={`/assignedtasks?user=${currentUsername}`} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Assigned Tasks</Link>
+                                        <Link href={`/assignedtasks/${currentUsername}`} className='hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400'>Assigned Tasks</Link>
                                         <div className="hover:bg-gray-100 p-2 rounded cursor-pointer border border-gray-400" onClick={logout}>Logout</div>
                                     </div>
                                     ) :
